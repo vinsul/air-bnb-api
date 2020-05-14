@@ -19,6 +19,7 @@
   },
   "homepage": "https://github.com/vinsul/air-bnb-api#readme",
   "dependencies": {
+    "cloudinary": "^1.21.0",
     "crypto-js": "^4.0.0",
     "dotenv": "^8.2.0",
     "express": "^4.17.1",

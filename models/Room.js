@@ -6,7 +6,7 @@ const Room = mongoose.model("Room", {
     price: Number,
     pictures: {
         user_picture: Object,
-        romm_picture: Object
+        room_picture: Object
     },
     created: Date,
     creator: {
