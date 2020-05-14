@@ -3,6 +3,7 @@ const express = require("express");
 const formidableMiddleware = require ("express-formidable");
 const publishRoomRoute = require("./routes/publish");
 const uploadProfilePictureRoute = require("./routes/upload_profile_pic");
+const getRoomRoute = require("./routes/getRoom");
 const mongoose = require("mongoose");
 
 const app = express();
@@ -19,6 +20,7 @@ const log_inRoute = require("./routes/log_in");
 app.use(log_inRoute);
 app.use(publishRoomRoute);
 app.use(uploadProfilePictureRoute);
+app.use(getRoomRoute);
 
 
 app.all("*", (req, res) => {
