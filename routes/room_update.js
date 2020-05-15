@@ -18,20 +18,18 @@ router.post("/room/update/:id", isAuthenticated, async (req, res) => {
     const fileKeys = Object.keys(req.files);
     let results = {};
 
-    if (fileKeys.length > 0)
-      fileKeys.forEach(async (fileKey) => {
-        try {
-          const file = req.files[fileKey];
-          const result = await cloudinary.uploader.upload(file.path);
-          results[fileKey] = {
-            success: true,
-            result: result,
-          };
-          console.log(results);
-        } catch (error) {
-          return res.json({ error: error.message });
-        }
-      });
+    const room_pictures = [];
+    if(req.files.room_picture1.type){
+        room_pictures.push(req.files.room_picture1.path)
+    }
+    if(req.files.room_picture2.type){
+        room_pictures.push(req.files.room_picture2.path)
+    }
+    const rp_upload_result = [];
+    for(let i = 0; i < room_pictures.length; i++){
+        const result = await cloudinary.uploader.upload(room_pictures[i]);
+        rp_upload_result.push(result);
+    }
 
     // récupérer l'id dans le body
     const idToFind = req.params.id;
@@ -39,8 +37,8 @@ router.post("/room/update/:id", isAuthenticated, async (req, res) => {
       path: "creator",
       select: "username profile_picture",
     });
-    if (roomToUpdate.room_picture !== results) {
-      roomToUpdate.room_picture = results;
+    if (roomToUpdate.room_picture !== rp_upload_result) {
+      roomToUpdate.room_picture = rp_upload_result;
     }
     if (roomToUpdate.title !== req.fields.title) {
       roomToUpdate.title = req.fields.title;
@@ -52,9 +50,15 @@ router.post("/room/update/:id", isAuthenticated, async (req, res) => {
       roomToUpdate.price = req.fields.price;
     }
     const newRoom = await roomToUpdate.save();
+    
+    const rp_displayed = [];
+    for (let i = 0; i < rp_upload_result.length; i++){
+        rp_displayed.push({secure_url: rp_upload_result[i].secure_url});
+    }
+    
     const pp_displayed = {};
-    if (newRoom.creator.profile_picture) {
-      pp_displayed.secure_url = room.creator.profile_picture.secure_url;
+    if(newRoom.creator.profile_picture){
+        pp_displayed.secure_url = newRoom.creator.profile_picture.secure_url;
     }
     return res.json({
       id: newRoom._id,
@@ -62,7 +66,7 @@ router.post("/room/update/:id", isAuthenticated, async (req, res) => {
       rate: newRoom.rate,
       description: newRoom.description,
       price: newRoom.price,
-      room_picture: newRoom.room_picture,
+      room_picture: rp_displayed,
       creator: {
         username: newRoom.creator.username,
         profile_picture: pp_displayed,
