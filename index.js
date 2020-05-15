@@ -1,9 +1,10 @@
 require("dotenv").config();
 const express = require("express");
-const formidableMiddleware = require ("express-formidable");
+const formidableMiddleware = require("express-formidable");
 const publishRoomRoute = require("./routes/publish");
 const uploadProfilePictureRoute = require("./routes/upload_profile_pic");
 const getRoomRoute = require("./routes/getRoom");
+const deleteRoomRoute = require("./routes/delete");
 const mongoose = require("mongoose");
 
 const app = express();
@@ -21,7 +22,7 @@ app.use(log_inRoute);
 app.use(publishRoomRoute);
 app.use(uploadProfilePictureRoute);
 app.use(getRoomRoute);
-
+app.use(deleteRoomRoute);
 
 app.all("*", (req, res) => {
     res.status(404).json({ message: "Bad URL" });
