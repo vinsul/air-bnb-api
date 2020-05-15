@@ -5,7 +5,10 @@ const User = mongoose.model("User", {
     username: String,
     name: String,
     description: { type: String, maxlength: 1000 },
-    profile_picture: Object,
+    profile_picture: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Picture"
+    },
     hash: String,
     salt: String,
     token: String
