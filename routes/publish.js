@@ -13,11 +13,14 @@ const router = express.Router();
 router.post("/room/publish", isAuthenticated, async (req, res) =>{
     try {
         const room_pictures = [];
-        if(req.files.room_picture1.type){
-            room_pictures.push(req.files.room_picture1.path)
+        const files_name = Object.keys(req.files);
+        for (let i = 0; i < files_name.length; i++){
+            if(req.files[files_name[i]].type){
+                room_pictures.push(req.files[files_name[i]].path)
+            }
         }
-        if(req.files.room_picture2.type){
-            room_pictures.push(req.files.room_picture2.path)
+        if(files_name.length === 0 || room_pictures.length === 0){
+            return res.status(400).json({message: "No picture added !"});
         }
         const rp_upload_result = [];
         for(let i = 0; i < room_pictures.length; i++){
