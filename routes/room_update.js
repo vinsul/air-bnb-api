@@ -14,34 +14,11 @@ cloudinary.config({
 
 router.post("/room/update/:id", isAuthenticated, async (req, res) => {
   try {
-    // uploader plusieurs photos
-    const fileKeys = Object.keys(req.files);
-    let results = {};
-
-    if (fileKeys.length > 0)
-      fileKeys.forEach(async (fileKey) => {
-        try {
-          const file = req.files[fileKey];
-          const result = await cloudinary.uploader.upload(file.path);
-          results[fileKey] = {
-            success: true,
-            result: result,
-          };
-          console.log(results);
-        } catch (error) {
-          return res.json({ error: error.message });
-        }
-      });
-
-    // récupérer l'id dans le body
     const idToFind = req.params.id;
     const roomToUpdate = await Room.findById(idToFind).populate({
       path: "creator",
       select: "username profile_picture",
     });
-    if (roomToUpdate.room_picture !== results) {
-      roomToUpdate.room_picture = results;
-    }
     if (roomToUpdate.title !== req.fields.title) {
       roomToUpdate.title = req.fields.title;
     }
@@ -52,9 +29,10 @@ router.post("/room/update/:id", isAuthenticated, async (req, res) => {
       roomToUpdate.price = req.fields.price;
     }
     const newRoom = await roomToUpdate.save();
+    
     const pp_displayed = {};
-    if (newRoom.creator.profile_picture) {
-      pp_displayed.secure_url = room.creator.profile_picture.secure_url;
+    if(newRoom.creator.profile_picture){
+        pp_displayed.secure_url = newRoom.creator.profile_picture.secure_url;
     }
     return res.json({
       id: newRoom._id,
