@@ -1,6 +1,6 @@
 require("dotenv").config();
 const express = require("express");
-const formidableMiddleware = require ("express-formidable");
+const formidableMiddleware = require("express-formidable");
 const publishRoomRoute = require("./routes/publish");
 const uploadProfilePictureRoute = require("./routes/upload_profile_pic");
 const getRoomRoute = require("./routes/getRoom");
