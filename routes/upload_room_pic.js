@@ -10,7 +10,7 @@ cloudinary.config({
 const isAuthenticated = require("./../middleware/isAuthenticated")
 const router = express.Router();
 
-router.post("/room/publish", isAuthenticated, async (req, res) =>{
+router.post("/room/picture/:room_id", isAuthenticated, async (req, res) => {
     try {
         const room_pictures = [];
         const files_name = Object.keys(req.files);
@@ -37,50 +37,20 @@ router.post("/room/publish", isAuthenticated, async (req, res) =>{
             picturesToCreate.push(picToCreate);
             await picToCreate.save();
         });
-        
-        const roomToPublish = new Room({
-            title: req.fields.title,
-            rate: 0,
-            description: req.fields.description,
-            price: req.fields.price,
-            room_picture: picturesToCreate,
-            created: new Date().toLocaleString(),
-            creator: req.user
-        });
-        await roomToPublish.save();
-        const rp_displayed = [];
+        const roomToUpdate = await Room.findById(req.params.room_id);
+        if(roomToUpdate.creator.toString() !== req.user._id.toString()){
+            return res.status(401).json({message: "Unauthorized !"});
+        }
+        const pic = roomToUpdate.room_picture;
         for (let i = 0; i < picturesToCreate.length; i++){
-            rp_displayed.push({
-                id: picturesToCreate[i]._id,
-                secure_url: picturesToCreate[i].infos.secure_url
-            });
+            pic.push(picturesToCreate[i]);
         }
-
-        const room = await Room.findById(roomToPublish._id)
-        .populate({path: "creator", select: "username profile_picture"});
-        const pp_displayed = {};
-        if(room.creator.profile_picture){
-            const pic = await Picture.findById(room.creator.profile_picture);
-            if(pic.isActive){
-                pp_displayed.id = room.creator.profile_picture;
-                pp_displayed.secure_url = pic.infos.secure_url;
-            }
-        }
-        res.status(200).json({
-            id: room._id,
-            title: room.title,
-            rate: room.rate,
-            description: room.description,
-            price: room.price,
-            room_picture: rp_displayed,
-            creator: {
-                username: room.creator.username,
-                profile_picture: pp_displayed
-            }
-        });
+        roomToUpdate.room_pictures = pic;
+        await roomToUpdate.save();
+        res.status(200).json({message: "Pictures added"});
     } catch (error) {
         res.status(400).json({message: error.message});
     }
-})
+});
 
 module.exports = router;
