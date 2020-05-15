@@ -12,12 +12,13 @@ const router = express.Router();
 
 router.post("/room/publish", isAuthenticated, async (req, res) =>{
     try {
-        const profile_picture = req.files.profile_picture.path;
-        const pp_upload_result = await cloudinary.uploader.upload(profile_picture);
-        const room_pictures = [
-            req.files.room_picture1.path,
-            req.files.room_picture2.path
-        ];
+        const room_pictures = [];
+        if(req.files.room_picture1.type){
+            room_pictures.push(req.files.room_picture1.path)
+        }
+        if(req.files.room_picture2.type){
+            room_pictures.push(req.files.room_picture2.path)
+        }
         const rp_upload_result = [];
         for(let i = 0; i < room_pictures.length; i++){
             const result = await cloudinary.uploader.upload(room_pictures[i]);
@@ -28,17 +29,32 @@ router.post("/room/publish", isAuthenticated, async (req, res) =>{
             rate: 0,
             description: req.fields.description,
             price: req.fields.price,
-            pictures: {
-                user_picture: pp_upload_result,
-                room_picture: rp_upload_result
-            },
+            room_picture: rp_upload_result,
             created: new Date().toLocaleString(),
-            creator: req.User
+            creator: req.user
         });
         await roomToPublish.save();
+        const rp_displayed = [];
+        for (let i = 0; i < rp_upload_result.length; i++){
+            rp_displayed.push({secure_url: rp_upload_result[i].secure_url});
+        }
 
+        const room = await Room.findById(roomToPublish._id).populate({path: "creator", select: "username profile_picture"});
+        const pp_displayed = {};
+        if(room.creator.profile_picture){
+            pp_displayed.secure_url = room.creator.profile_picture.secure_url;
+        }
         res.status(200).json({
-            message: "updated"
+            id: room._id,
+            title: room.title,
+            rate: room.rate,
+            description: room.description,
+            price: room.price,
+            room_picture: rp_displayed,
+            creator: {
+                username: room.creator.username,
+                profile_picture: pp_displayed
+            }
         });
     } catch (error) {
         res.status(400).json({message: error.message});

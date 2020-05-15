@@ -2,12 +2,9 @@ const mongoose = require("mongoose");
 const Room = mongoose.model("Room", {
     title: String,
     rate: Number,
-    description: String,
+    description: {type: String, maxlength: 1000},
     price: Number,
-    pictures: {
-        user_picture: Object,
-        room_picture: Object
-    },
+    room_picture:  Object,
     created: Date,
     creator: {
         type: mongoose.Schema.Types.ObjectId,
