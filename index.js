@@ -1,34 +1,44 @@
 require("dotenv").config();
 const express = require("express");
+const cloudinary = require("cloudinary").v2;
 const formidableMiddleware = require("express-formidable");
-const publishRoomRoute = require("./routes/publish");
-const uploadProfilePictureRoute = require("./routes/upload_profile_pic");
-const getRoomRoute = require("./routes/getRoom");
-const deleteRoomRoute = require("./routes/delete");
-const deletePictureRoute = require("./routes/delete_picture");
-const uploadRoomPicture = require("./routes/upload_room_pic");
 const mongoose = require("mongoose");
 
 const app = express();
-
 app.use(formidableMiddleware());
+
+
+cloudinary.config({
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME, 
+  api_key: process.env.CLOUDINARY_API_KEY, 
+  api_secret: process.env.CLOUDINARY_API_SECRET 
+});
+
 mongoose.connect(process.env.MONGODB_URI, {
   useNewUrlParser: true,
   useUnifiedTopology: true,
 });
 
-const signUpRoute = require("./routes/sign_up");
-app.use(signUpRoute);
-const log_inRoute = require("./routes/log_in");
-app.use(log_inRoute);
-const roomUpdateRoute = require("./routes/room_update");
-app.use(roomUpdateRoute);
-app.use(publishRoomRoute);
-app.use(uploadProfilePictureRoute);
-app.use(getRoomRoute);
-app.use(deleteRoomRoute);
-app.use(deletePictureRoute);
-app.use(uploadRoomPicture);
+const sign_up_route = require("./routes/sign_up");
+const log_in_route = require("./routes/log_in");
+const publish_room_route = require("./routes/publish_room");
+const room_update_route = require("./routes/update_room");
+const upload_profile_picture_route = require("./routes/upload_profile_picture");
+const get_room_route = require("./routes/get_room");
+const delete_room_route = require("./routes/delete_room");
+const delete_picture_route = require("./routes/delete_picture");
+const upload_room_picture = require("./routes/upload_room_picture");
+
+
+app.use(sign_up_route);
+app.use(log_in_route);
+app.use(room_update_route);
+app.use(publish_room_route);
+app.use(upload_profile_picture_route);
+app.use(get_room_route);
+app.use(delete_room_route);
+app.use(delete_picture_route);
+app.use(upload_room_picture);
 
 app.all("*", (req, res) => {
   res.status(404).json({ message: "Bad URL" });

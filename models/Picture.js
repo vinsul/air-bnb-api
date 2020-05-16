@@ -2,7 +2,7 @@ const mongoose = require("mongoose");
 
 const Picture = mongoose.model("Picture", {
     type: String,
-    isActive: Boolean,
+    is_active: Boolean,
     infos: Object,
 });
 

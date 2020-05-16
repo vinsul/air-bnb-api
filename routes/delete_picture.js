@@ -3,41 +3,40 @@ const User = require("./../models/User");
 const Room = require("./../models/Room");
 const Picture = require("./../models/Picture");
 const cloudinary = require("cloudinary").v2;
-cloudinary.config({
-    cloud_name: process.env.CLOUDINARY_CLOUD_NAME, 
-    api_key: process.env.CLOUDINARY_API_KEY, 
-    api_secret: process.env.CLOUDINARY_API_SECRET 
-});
-const isAuthenticated = require("./../middleware/isAuthenticated")
+const is_authenticated = require("./../middleware/is_authenticated")
+
 const router = express.Router();
 
-router.post("/picture/delete/:picture_id", isAuthenticated, async (req, res) => {
+router.post("/picture/delete/:picture_id", is_authenticated, async (req, res) => {
     try {
-        const pictureToDelete = await Picture.findById(req.params.picture_id);
-        if (!pictureToDelete.isActive){
+
+        const picture_to_delete = await Picture.findById(req.params.picture_id);
+
+        if (!picture_to_delete.is_active){
             return res.status(400).json({message: "Picture already deleted"});
         }
-        if (pictureToDelete.type === "profile_picture") {
-            if (pictureToDelete._id.toString() !== req.user.profile_picture.toString()){
+        if (picture_to_delete.type === "profile_picture") {
+            if (picture_to_delete._id.toString() !== req.user.profile_picture.toString()){
                 return res.status(401).json({message: "Unauthorized !"});
-            }
-            
+            } 
         }
-        if (pictureToDelete.type === "room_picture"){
+        if (picture_to_delete.type === "room_picture"){
             const room = await Room.findOne({room_picture: req.params.picture_id});
             if(room.creator.toString() !== req.user._id.toString()){
                 return res.status(401).json({message: "Unauthorized !"});
             }
         }
-        const result = await cloudinary.uploader.destroy(pictureToDelete.infos.public_id);
-        pictureToDelete.isActive = false;
-        await pictureToDelete.save();
+
+        const result = await cloudinary.uploader.destroy(picture_to_delete.infos.public_id);
+        picture_to_delete.is_active = false;
+        await picture_to_delete.save();
+
         res.status(400).json({
             message: "Picture deleted",
             result: result,
-            status_isActive: pictureToDelete.isActive
+            status_is_active: picture_to_delete.is_active
         });
-
+        
     } catch (error) {
         res.status(400).json({message: error.message});
     }

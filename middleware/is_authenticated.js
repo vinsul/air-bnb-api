@@ -1,6 +1,6 @@
-const User = require("./../models/User");
+const User = require("../models/User");
 
-const isAuthenticated = async (req, res, next) => {
+const is_authenticated = async (req, res, next) => {
     try {
         if (req.headers.authorization) {
             const user = await User.findOne(
@@ -21,4 +21,4 @@ const isAuthenticated = async (req, res, next) => {
     }
 };
 
-module.exports = isAuthenticated;
+module.exports = is_authenticated;
