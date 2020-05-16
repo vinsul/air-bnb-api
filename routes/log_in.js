@@ -31,7 +31,6 @@ router.post("/log_in", async(req, res) => {
         } else {
             return res.status(404).json({ message: "Account not find" });
         }
-
     } catch (error) {
         return res.status(400).json({ error: error.message });
     }

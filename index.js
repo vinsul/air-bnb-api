@@ -7,18 +7,17 @@ const mongoose = require("mongoose");
 const app = express();
 app.use(formidableMiddleware());
 
-
 cloudinary.config({
-  cloud_name: process.env.CLOUDINARY_CLOUD_NAME, 
-  api_key: process.env.CLOUDINARY_API_KEY, 
-  api_secret: process.env.CLOUDINARY_API_SECRET 
+    cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+    api_key: process.env.CLOUDINARY_API_KEY,
+    api_secret: process.env.CLOUDINARY_API_SECRET,
 });
 
 mongoose.connect(process.env.MONGODB_URI, {
-  useNewUrlParser: true,
-  useUnifiedTopology: true,
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
 });
-
+const update_password = require("./routes/update_password");
 const sign_up_route = require("./routes/sign_up");
 const log_in_route = require("./routes/log_in");
 const publish_room_route = require("./routes/publish_room");
@@ -29,7 +28,7 @@ const delete_room_route = require("./routes/delete_room");
 const delete_picture_route = require("./routes/delete_picture");
 const upload_room_picture = require("./routes/upload_room_picture");
 
-
+app.use(update_password);
 app.use(sign_up_route);
 app.use(log_in_route);
 app.use(room_update_route);
@@ -41,9 +40,9 @@ app.use(delete_picture_route);
 app.use(upload_room_picture);
 
 app.all("*", (req, res) => {
-  res.status(404).json({ message: "Bad URL" });
+    res.status(404).json({ message: "Bad URL" });
 });
 
 app.listen(process.env.PORT, () => {
-  console.log("Server started");
+    console.log("Server started");
 });
