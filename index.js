@@ -28,6 +28,7 @@ const get_room_route = require("./routes/get_room");
 const delete_room_route = require("./routes/delete_room");
 const delete_picture_route = require("./routes/delete_picture");
 const upload_room_picture = require("./routes/upload_room_picture");
+const delete_user_and_users_room_route = require("./routes/delete_user_and _users_rooms");
 
 
 app.use(sign_up_route);
@@ -39,6 +40,7 @@ app.use(get_room_route);
 app.use(delete_room_route);
 app.use(delete_picture_route);
 app.use(upload_room_picture);
+app.use(delete_user_and_users_room_route);
 
 app.all("*", (req, res) => {
   res.status(404).json({ message: "Bad URL" });
