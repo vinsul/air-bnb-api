@@ -1,8 +1,9 @@
 const express = require("express");
 const cloudinary = require("cloudinary").v2;
 const router = express.Router();
-const Room = require("../models/Room.js");
-const isAuthenticated = require("../middleware/isAuthenticated");
+const Room = require("./../models/Room.js");
+const Picture = require("./../models/Picture")
+const isAuthenticated = require("./../middleware/isAuthenticated");
 const formidableMiddleware = require("express-formidable");
 router.use(formidableMiddleware());
 
@@ -15,36 +16,50 @@ cloudinary.config({
 router.post("/room/update/:id", isAuthenticated, async (req, res) => {
   try {
     const idToFind = req.params.id;
-    const roomToUpdate = await Room.findById(idToFind).populate({
+    const roomToUpdate = await Room.findById(idToFind)
+    .populate({
       path: "creator",
       select: "username profile_picture",
-    });
-    if (roomToUpdate.title !== req.fields.title) {
+    })
+    .populate("room_picture");
+    if (req.fields.title) {
       roomToUpdate.title = req.fields.title;
     }
-    if (roomToUpdate.description !== req.fields.description) {
+    if (req.fields.description) {
       roomToUpdate.description = req.fields.description;
     }
-    if (roomToUpdate.price !== Number(req.fields.price)) {
+    if (req.fields.price) {
       roomToUpdate.price = req.fields.price;
     }
-    const newRoom = await roomToUpdate.save();
-    
+    await roomToUpdate.save();
     const pp_displayed = {};
-    if(newRoom.creator.profile_picture){
-        pp_displayed.secure_url = newRoom.creator.profile_picture.secure_url;
+    const rp_displayed = [];
+    for (let i = 0; i < roomToUpdate.room_picture.length; i++){
+        if(roomToUpdate.room_picture[i].isActive){
+            rp_displayed.push({
+                id: roomToUpdate.room_picture[i]._id,
+                secure_url: roomToUpdate.room_picture[i].infos.secure_url
+            });
+        }
+    }
+    if(roomToUpdate.creator.profile_picture){
+        const pic = await Picture.findById(roomToUpdate.creator.profile_picture);
+        if(pic.isActive){
+            pp_displayed.id = roomToUpdate.creator.profile_picture;
+            pp_displayed.secure_url = pic.infos.secure_url;
+        }
     }
     return res.json({
-      id: newRoom._id,
-      title: newRoom.title,
-      rate: newRoom.rate,
-      description: newRoom.description,
-      price: newRoom.price,
-      room_picture: newRoom.room_picture,
+      id: roomToUpdate._id,
+      title: roomToUpdate.title,
+      rate: roomToUpdate.rate,
+      description: roomToUpdate.description,
+      price: roomToUpdate.price,
+      room_picture: rp_displayed,
       creator: {
-        username: newRoom.creator.username,
+        username: roomToUpdate.creator.username,
         profile_picture: pp_displayed,
-      },
+      }
     });
   } catch (error) {
     res.status(404).json({ error: error.message });
