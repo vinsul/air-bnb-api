@@ -45,6 +45,10 @@ router.post("/room/publish", is_authenticated, async (req, res) =>{
             rate: 0,
             description: req.fields.description,
             price: req.fields.price,
+            location: {
+                longitude: Number(req.fields.longitude),
+                latitude: Number(req.fields.latitude)
+            },
             room_picture: pictures_to_create,
             created: new Date().toLocaleString(),
             creator: req.user
@@ -80,6 +84,7 @@ router.post("/room/publish", is_authenticated, async (req, res) =>{
             rate: room.rate,
             description: room.description,
             price: room.price,
+            location: room.location,
             room_picture: room_picture_displayed,
             creator: {
                 username: room.creator.username,

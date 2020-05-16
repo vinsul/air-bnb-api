@@ -10,6 +10,10 @@ const Room = mongoose.model("Room", {
         ref: "Picture"
     }],
     created: Date,
+    location: {
+        longitude: Number,
+        latitude: Number
+    },
     creator: {
         type: mongoose.Schema.Types.ObjectId,
         ref: "User"

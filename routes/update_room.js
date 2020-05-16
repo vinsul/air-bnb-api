@@ -26,6 +26,12 @@ router.post("/room/update/:id", is_authenticated, async (req, res) => {
     if (req.fields.price) {
       room_to_update.price = req.fields.price;
     }
+    if(req.fields.latitude){
+      room_to_update.location.latitude = req.fields.latitude;
+    }
+    if(req.fields.longitude){
+      room_to_update.location.longitude = req.fields.longitude;
+    }
 
     await room_to_update.save();
 
@@ -55,6 +61,7 @@ router.post("/room/update/:id", is_authenticated, async (req, res) => {
       rate: room_to_update.rate,
       description: room_to_update.description,
       price: room_to_update.price,
+      location: room_to_update.location,
       room_picture: room_picture_displayed,
       creator: {
         username: room_to_update.creator.username,
