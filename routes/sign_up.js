@@ -55,12 +55,21 @@ router.post("/sign_up", async (req, res) => {
       text: "Thanks for using Airbnb !",
     };
 
-    mg.messages().send(data, function (error, body) {
-      console.log(body);
-      console.log(error);
+    mg.messages().send(data, (error, body) => {
+      if (body.id) {
+        console.log(body);
+        return res.status(200).json({
+            message: "User created",
+            email_status: `Ok :  ${body.message}`,
+        });
+    } else {
+        return res.status(200).json({
+            password_status: "User created",
+            email_status: `Fail : ${body.message}`,
+        });
+    }
     });
 
-    return res.status(200).json({ message: "A confirmation mail has been sent to the new user." });
   } catch (error) {
     return res.status(400).json({ error: error.message });
   }
