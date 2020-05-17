@@ -11,13 +11,15 @@ const Room = mongoose.model("Room", {
     }],
     created: Date,
     location: {
-        longitude: Number,
-        latitude: Number
-    },
+        type: {type: String, default: "Point"},
+        coordinates: {type: [Number], default: [0, 0]}
+       },
     creator: {
         type: mongoose.Schema.Types.ObjectId,
         ref: "User"
     }
 });
+
+Room.collection.createIndex( {location : "2dsphere" } )
 
 module.exports = Room;

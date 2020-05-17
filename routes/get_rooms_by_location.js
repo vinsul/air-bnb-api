@@ -22,26 +22,18 @@ const distance = (a, b) => {
 
 router.get("/rooms/around", async (req, res) => {
     try {
-
-        const all_rooms = await Room.find()
+        
+        const rooms_to_display = await Room.find({location:{ $near :
+                {
+                    $geometry: { type: "Point",  
+                        coordinates: [req.query.longitude, req.query.latitude] },
+                    $maxDistance: 20000
+                }
+            }
+        })
         .populate({path: "creator", select: "username profile_picture"})
-        .populate("room_picture");
-
-        const rooms_to_display = [];
-        //const distances = []
-
-        for (let i = 0; i < all_rooms.length; i++){
-
-            if(rooms_to_display.length === 20){
-                break;
-            }
-            const room_location = all_rooms[i].location;
-            const user_location = req.fields.user_location;
-            //distances.push(distance(room_location, user_location));
-            if(distance(room_location, user_location) <= 20){
-                rooms_to_display.push(all_rooms[i]);
-            }
-        }
+        .populate("room_picture")
+        .limit(20);
         
         if (rooms_to_display.length === 0){
             return res.status(200).json({message: "No room to display"});
@@ -85,7 +77,10 @@ router.get("/rooms/around", async (req, res) => {
             });
         }
         
-        return res.status(200).json(payload);
+        return res.status(200).json({
+            count: rooms_to_display.length,
+            result: payload
+        });
 
     } catch (error) {
         res.status(400).json({message: error.message});

@@ -52,6 +52,7 @@ router.get("/rooms/:user_id", async (req, res) => {
                 title: rooms_to_get[i].title,
                 rate: rooms_to_get[i].rate,
                 description: rooms_to_get[i].description,
+                location: rooms_to_get[i].location,
                 price: rooms_to_get[i].price,
                 room_picture: room_picture_displayed,
                 creator: {

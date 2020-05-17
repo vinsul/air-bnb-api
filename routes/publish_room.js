@@ -46,8 +46,8 @@ router.post("/room/publish", is_authenticated, async (req, res) =>{
             description: req.fields.description,
             price: req.fields.price,
             location: {
-                longitude: Number(req.fields.longitude),
-                latitude: Number(req.fields.latitude)
+                type: "Point",
+                coordinates: [Number(req.fields.longitude), Number(req.fields.latitude)]
             },
             room_picture: pictures_to_create,
             created: new Date().toLocaleString(),
