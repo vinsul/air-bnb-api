@@ -16,13 +16,13 @@ router.post("/profile/update", is_authenticated, async (req, res) => {
             user_to_update.username = req.fields.username;
         }
         if (req.fields.email){
-            user_to_update.username = req.fields.email;
+            user_to_update.email = req.fields.email;
         }
         if (req.fields.name){
-            user_to_update.username = req.fields.name;
+            user_to_update.name = req.fields.name;
         }
         if (req.fields.description){
-            user_to_update.username = req.fields.description;
+            user_to_update.description = req.fields.description;
         }
 
         await user_to_update.save();

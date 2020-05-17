@@ -7,7 +7,7 @@ const mailgun = require("mailgun-js");
 const router = express.Router();
 const is_authenticated = require("../middleware/is_authenticated");
 
-router.post("/uptdate_password", is_authenticated, async(req, res) => {
+router.post("/update_password", is_authenticated, async(req, res) => {
     try {
         const user_finded = await User.findOne({ email: req.fields.email });
         if (user_finded) {

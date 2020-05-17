@@ -19,7 +19,7 @@ router.get("/rooms/:user_id", async (req, res) => {
         .populate({path: "creator", select: "username profile_picture"})
         .populate("room_picture");
 
-        if(!rooms_to_get){
+        if(rooms_to_get.length === 0){
             return res.status(400).json({message: "No room to display"});
         }
 

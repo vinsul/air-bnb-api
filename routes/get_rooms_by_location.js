@@ -27,7 +27,7 @@ router.get("/rooms/around", async (req, res) => {
                 {
                     $geometry: { type: "Point",  
                         coordinates: [req.query.longitude, req.query.latitude] },
-                    $maxDistance: 20000
+                    $maxDistance: 275000
                 }
             }
         })
