@@ -17,6 +17,10 @@ router.post("/room/update/:id", is_authenticated, async (req, res) => {
     })
     .populate("room_picture");
 
+    if(!room_to_update){
+      return res.status(400).json({message: "Room not found"})
+    }
+
     if (req.fields.title) {
       room_to_update.title = req.fields.title;
     }
@@ -26,11 +30,8 @@ router.post("/room/update/:id", is_authenticated, async (req, res) => {
     if (req.fields.price) {
       room_to_update.price = req.fields.price;
     }
-    if(req.fields.latitude){
-      room_to_update.location.latitude = req.fields.latitude;
-    }
-    if(req.fields.longitude){
-      room_to_update.location.longitude = req.fields.longitude;
+    if(req.fields.latitude && req.fields.longitude){
+      room_to_update.location.coordinates = [req.fields.longitude, req.fields.latitude];
     }
 
     await room_to_update.save();
